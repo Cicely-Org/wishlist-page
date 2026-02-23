@@ -14,6 +14,16 @@ export async function POST(req: NextRequest) {
 
     const result = await addToWaitlist({ name, email, role, blender_experience });
 
+    const webhookURL = process.env.DISCORD_WEBHOOK_URL;
+
+    await fetch(webhookURL!, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: `\n\n## **New Waitlist Signup**\n\n- **Name:** ${name}\n- **Blender Experience:** ${blender_experience}`
+      })
+    });
+
     if (result.length === 0)
       return NextResponse.json({ message: "You're already on the waitlist!" }, { status: 200 });
 

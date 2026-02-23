@@ -26,6 +26,7 @@ function Spinner() {
 
 export default function WaitlistSection() {
   const [form, setForm] = useState({ name: "", email: "", role: "", blender_experience: "" });
+  const [submittedEmail, setSubmittedEmail] = useState("");
   const [fb, setFb] = useState({ problem: "", notify_updates: true });
   const [wState, setWState] = useState<State>("idle");
   const [wMsg, setWMsg] = useState("");
@@ -42,14 +43,15 @@ export default function WaitlistSection() {
         body: JSON.stringify(form),
       });
       const data = await res.json();
-      if (res.ok) { setWState("success"); setWMsg(data.message); setForm({ name: "", email: "", role: "", blender_experience: "" }); }
-      else         { setWState("error");   setWMsg(data.error); }
+      if (res.ok) { setWState("success"); setWMsg(data.message); setSubmittedEmail(form.email); setForm({ name: "", email: "", role: "", blender_experience: "" }); }
+      else { setWState("error"); setWMsg(data.error); }
     } catch { setWState("error"); setWMsg("Network error. Please try again."); }
   };
 
   const submitFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.email && wState !== "success") {
+    const emailToUse = form.email || submittedEmail;
+    if (!emailToUse) {
       setFState("error"); setFMsg("Please join the waitlist first so we know who to notify."); return;
     }
     setFState("loading");
@@ -57,11 +59,11 @@ export default function WaitlistSection() {
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, problem: fb.problem, notify_updates: fb.notify_updates }),
+        body: JSON.stringify({ email: emailToUse, problem: fb.problem, notify_updates: fb.notify_updates }),
       });
       const data = await res.json();
       if (res.ok) { setFState("success"); setFMsg(data.message); setFb({ problem: "", notify_updates: true }); }
-      else         { setFState("error");   setFMsg(data.error); }
+      else { setFState("error"); setFMsg(data.error); }
     } catch { setFState("error"); setFMsg("Network error. Please try again."); }
   };
 
@@ -111,9 +113,9 @@ export default function WaitlistSection() {
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                   style={{ background: "rgba(50,37,185,0.18)", border: "1px solid rgba(50,37,185,0.3)" }}>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M2 12V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v7" stroke="#a89fff" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M1 12h14" stroke="#a89fff" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M6 8h4M8 6v4" stroke="#a89fff" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M2 12V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v7" stroke="#a89fff" strokeWidth="1.5" strokeLinecap="round" />
+                    <path d="M1 12h14" stroke="#a89fff" strokeWidth="1.5" strokeLinecap="round" />
+                    <path d="M6 8h4M8 6v4" stroke="#a89fff" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
                 </div>
                 <div>
@@ -201,8 +203,8 @@ export default function WaitlistSection() {
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                     style={{ background: "rgba(165,42,255,0.15)", border: "1px solid rgba(165,42,255,0.25)" }}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M2 3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5l-3 2V3Z" stroke="#c97fff" strokeWidth="1.5" strokeLinejoin="round"/>
-                      <path d="M5 6h6M5 9h4" stroke="#c97fff" strokeWidth="1.5" strokeLinecap="round"/>
+                      <path d="M2 3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5l-3 2V3Z" stroke="#c97fff" strokeWidth="1.5" strokeLinejoin="round" />
+                      <path d="M5 6h6M5 9h4" stroke="#c97fff" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
                   </div>
                   <div>
